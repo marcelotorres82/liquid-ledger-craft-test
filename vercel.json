@@ -1,8 +1,8 @@
 {
   "version": 2,
   "framework": null,
-  "devCommand": null,
-  "buildCommand": null,
+  "buildCommand": "npm run vercel-build",
+  "outputDirectory": "public",
   "rewrites": [
     {
       "source": "/api/(.*)",
@@ -10,15 +10,11 @@
     },
     {
       "source": "/app",
-      "destination": "/public/app/index.html"
+      "destination": "/app/index.html"
     },
     {
       "source": "/app/(.*)",
-      "destination": "/public/app/index.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/public/$1"
+      "destination": "/app/index.html"
     }
   ],
   "headers": [
