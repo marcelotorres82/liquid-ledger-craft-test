@@ -9,16 +9,14 @@
     "ui:install": "npm install --prefix frontend",
     "ui:build": "npm run build --prefix frontend && mkdir -p public/app && find public/app -mindepth 1 -delete && cp -R frontend/dist/. public/app/",
     "deploy": "vercel --prod",
-    "vercel-build": "npm run prisma:generate",
-    "postinstall": "npm run prisma:generate",
-    "init-db": "node scripts/init-db.js",
-    "prisma:generate": "prisma generate --schema lib/prisma/schema.prisma",
-    "prisma:push": "prisma db push --schema lib/prisma/schema.prisma",
+    "vercel-build": "prisma generate && npm run ui:build",
+    "postinstall": "prisma generate",
     "prisma:studio": "prisma studio --schema lib/prisma/schema.prisma",
     "prisma:seed": "node lib/prisma/seed.js"
   },
   "prisma": {
-    "schema": "lib/prisma/schema.prisma"
+    "schema": "lib/prisma/schema.prisma",
+    "seed": "node lib/prisma/seed.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
@@ -30,6 +28,6 @@
   },
   "devDependencies": {
     "prisma": "^5.20.0",
-    "vercel": "^50.17.1"
+    "vercel": "^50.32.5"
   }
 }

@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Trash2, X } from 'lucide-react';
+import { Trash2, X, Plus } from 'lucide-react';
 import type { Despesa } from '@/types/finance';
 import {
   encodeExpenseDescription,
   EXPENSE_CATEGORIES,
   getComprasMesLabel,
   parseExpenseDescription,
-  type ExpenseCategory,
+  getExpenseCategoryMeta,
+  getCategoryLabel,
+  type ExpenseCategoryMeta,
 } from '@/lib/expenseMeta';
 import { cn } from '@/lib/utils';
 import { setSheetOpenState } from '@/lib/sheetState';
@@ -50,7 +52,8 @@ function getTodayISODate() {
 
 const ExpenseSheet = ({ open, onClose, onSave, initialDate, referenceMonth, editing, onDelete }: ExpenseSheetProps) => {
   const [descricao, setDescricao] = useState('');
-  const [categoria, setCategoria] = useState<ExpenseCategory>('contas_fixas');
+  const [categoria, setCategoria] = useState<string>('contas_fixas');
+  const [customCategories, setCustomCategories] = useState<string[]>([]);
   const [valorParcela, setValorParcela] = useState('');
   const [tipo, setTipo] = useState<'fixa' | 'avulsa' | 'parcelada'>('fixa');
   const [dataInicio, setDataInicio] = useState(initialDate);
@@ -60,6 +63,19 @@ const ExpenseSheet = ({ open, onClose, onSave, initialDate, referenceMonth, edit
   const [valorPrimeiraParcela, setValorPrimeiraParcela] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+
+  const allCategoriesKeys = React.useMemo(() => {
+    const defaultKeys = EXPENSE_CATEGORIES.map(c => c.key);
+    return [...new Set([...defaultKeys, ...customCategories, categoria])];
+  }, [customCategories, categoria]);
+
+  const handleAddCategory = () => {
+    const label = window.prompt('Nome da nova categoria:');
+    if (label && label.trim()) {
+      setCustomCategories(prev => [...prev, label.trim()]);
+      setCategoria(label.trim());
+    }
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -95,7 +111,7 @@ const ExpenseSheet = ({ open, onClose, onSave, initialDate, referenceMonth, edit
         try {
           const parsed = JSON.parse(raw) as Partial<{
             descricao: string;
-            categoria: ExpenseCategory;
+            categoria: string;
             valorParcela: string;
             tipo: 'fixa' | 'avulsa' | 'parcelada';
             dataInicio: string;
@@ -103,8 +119,12 @@ const ExpenseSheet = ({ open, onClose, onSave, initialDate, referenceMonth, edit
             dataPagamento: string;
             parcelasTotal: string;
             valorPrimeiraParcela: string;
+            customCats: string[];
           }>;
 
+          if (parsed.customCats) {
+             setCustomCategories(parsed.customCats);
+          }
           setDescricao(parsed.descricao || '');
           setCategoria(parsed.categoria || 'contas_fixas');
           setValorParcela(parsed.valorParcela || '');
@@ -152,6 +172,7 @@ const ExpenseSheet = ({ open, onClose, onSave, initialDate, referenceMonth, edit
         dataPagamento,
         parcelasTotal,
         valorPrimeiraParcela,
+        customCats: customCategories,
       })
     );
   }, [
@@ -330,17 +351,37 @@ const ExpenseSheet = ({ open, onClose, onSave, initialDate, referenceMonth, edit
                   className="w-full px-4 py-3 rounded-2xl bg-secondary text-foreground text-subhead placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30 transition-all"
                 />
 
-                <select
-                  value={categoria}
-                  onChange={(event) => setCategoria(event.target.value as ExpenseCategory)}
-                  className="w-full px-4 py-3 rounded-2xl bg-secondary text-foreground text-subhead outline-none focus:ring-2 focus:ring-primary/30 transition-all appearance-none"
-                >
-                  {EXPENSE_CATEGORIES.map((item) => (
-                    <option key={item.key} value={item.key}>
-                      Categoria: {item.key === 'compras' ? getComprasMesLabel(referenceMonth) : item.label}
-                    </option>
-                  ))}
-                </select>
+                <div className="w-full">
+                  <p className="text-caption text-muted-foreground mb-2">Categoria</p>
+                  <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x">
+                    {allCategoriesKeys.map((catKey) => {
+                      const isSelected = categoria === catKey;
+                      const label = getCategoryLabel(catKey, referenceMonth);
+                      return (
+                        <button
+                          key={catKey}
+                          type="button"
+                          onClick={() => setCategoria(catKey)}
+                          className={cn(
+                            'whitespace-nowrap px-4 py-2 rounded-2xl text-subhead font-medium transition-colors tap-highlight-none snap-start',
+                            isSelected 
+                              ? 'gradient-expense text-expense-foreground shadow-sm shadow-expense/20' 
+                              : 'bg-secondary text-muted-foreground border border-border/40'
+                          )}
+                        >
+                          {label}
+                        </button>
+                      );
+                    })}
+                    <button
+                       type="button"
+                       onClick={handleAddCategory}
+                       className="whitespace-nowrap px-4 py-2 rounded-2xl text-subhead font-medium bg-secondary text-primary border border-primary/30 tap-highlight-none snap-start flex items-center gap-1"
+                    >
+                      <Plus className="w-4 h-4" /> Nova
+                    </button>
+                  </div>
+                </div>
 
                 <select
                   value={tipo}

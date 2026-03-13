@@ -50,6 +50,19 @@ function getValorParcelaMes(despesa, parcelaAtual) {
 }
 
 function mapDespesaToFrontend(despesa) {
+  let isPaga = Boolean(despesa.paga);
+  let dtPagamento = despesa.dataPagamento ? formatDate(despesa.dataPagamento) : null;
+
+  if ((despesa.tipo === 'fixa' || despesa.tipo === 'parcelada') && despesa.pagamentos) {
+    if (despesa.pagamentos.length > 0) {
+      isPaga = true;
+      dtPagamento = formatDate(despesa.pagamentos[0].dataPagamento);
+    } else {
+      isPaga = false;
+      dtPagamento = null;
+    }
+  }
+
   return {
     id: despesa.id,
     descricao: despesa.descricao,
@@ -58,8 +71,8 @@ function mapDespesaToFrontend(despesa) {
       despesa.valorPrimeiraParcela == null ? null : toNumber(despesa.valorPrimeiraParcela),
     tipo: despesa.tipo,
     data_inicio: formatDate(despesa.dataInicio),
-    paga: Boolean(despesa.paga),
-    data_pagamento: despesa.dataPagamento ? formatDate(despesa.dataPagamento) : null,
+    paga: isPaga,
+    data_pagamento: dtPagamento,
     parcelas_total: Number(despesa.parcelasTotal) || 1,
   };
 }
@@ -83,6 +96,8 @@ function validateDespesaPayload(payload) {
     paga,
     data_pagamento,
     parcelas_total = 1,
+    mes_referencia,
+    ano_referencia,
   } = payload ?? {};
 
   const descricaoLimpa = String(descricao || '').trim();
@@ -149,6 +164,10 @@ function validateDespesaPayload(payload) {
       dataPagamento,
       parcelasTotal,
     },
+    contexto: {
+      mes: mes_referencia ? Number(mes_referencia) : null,
+      ano: ano_referencia ? Number(ano_referencia) : null,
+    }
   };
 }
 
@@ -182,6 +201,7 @@ export default async function handler(req, res) {
             usuarioId: userId,
             tipo: 'fixa',
           },
+          include: { pagamentos: { where: { mes, ano } } },
           orderBy: { dataInicio: 'desc' },
         }),
         prisma.despesa.findMany({
@@ -200,6 +220,7 @@ export default async function handler(req, res) {
             usuarioId: userId,
             tipo: 'parcelada',
           },
+          include: { pagamentos: { where: { mes, ano } } },
           orderBy: { dataInicio: 'desc' },
         }),
       ]);
@@ -271,6 +292,19 @@ export default async function handler(req, res) {
           ...parsed.data,
         },
       });
+      
+      const isRecurring = despesa.tipo === 'fixa' || despesa.tipo === 'parcelada';
+      if (isRecurring && parsed.contexto.mes && parsed.contexto.ano && despesa.paga) {
+        await prisma.pagamentoDespesa.create({
+          data: {
+             despesaId: despesa.id,
+             mes: parsed.contexto.mes,
+             ano: parsed.contexto.ano,
+             valorPago: despesa.valorParcela,
+             dataPagamento: despesa.dataPagamento || new Date()
+          }
+        });
+      }
 
       return res.status(201).json({
         success: true,
@@ -296,19 +330,47 @@ export default async function handler(req, res) {
         return res.status(400).json({ success: false, message: parsed.error });
       }
 
-      const updated = await prisma.despesa.updateMany({
-        where: {
-          id,
-          usuarioId: userId,
-        },
-        data: parsed.data,
+      const existing = await prisma.despesa.findFirst({
+        where: { id, usuarioId: userId },
       });
 
-      if (updated.count === 0) {
+      if (!existing) {
         return res.status(404).json({
           success: false,
           message: 'Despesa não encontrada',
         });
+      }
+
+      await prisma.despesa.update({
+        where: { id },
+        data: parsed.data,
+      });
+
+      const isRecurring = existing.tipo === 'fixa' || existing.tipo === 'parcelada';
+      
+      if (isRecurring && parsed.contexto.mes && parsed.contexto.ano) {
+         if (parsed.data.paga) {
+           await prisma.pagamentoDespesa.upsert({
+             where: {
+               despesaId_mes_ano: { despesaId: id, mes: parsed.contexto.mes, ano: parsed.contexto.ano }
+             },
+             create: {
+               despesaId: id,
+               mes: parsed.contexto.mes,
+               ano: parsed.contexto.ano,
+               valorPago: parsed.data.valorParcela,
+               dataPagamento: parsed.data.dataPagamento || new Date()
+             },
+             update: {
+               valorPago: parsed.data.valorParcela,
+               dataPagamento: parsed.data.dataPagamento || new Date()
+             }
+           });
+         } else {
+           await prisma.pagamentoDespesa.deleteMany({
+             where: { despesaId: id, mes: parsed.contexto.mes, ano: parsed.contexto.ano }
+           });
+         }
       }
 
       return res.status(200).json({

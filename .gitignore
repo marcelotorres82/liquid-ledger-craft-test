@@ -48,3 +48,4 @@ lib/prisma/migrations/
 # Font files (proprietary)
 .font-extract/
 public/downloads/*.apk
+.vercel

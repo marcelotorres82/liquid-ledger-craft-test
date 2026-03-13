@@ -30,6 +30,7 @@ const PageContainer = ({
   const currentMonth = useFinanceStore((state) => state.currentMonth);
   const currentYear = useFinanceStore((state) => state.currentYear);
   const setPeriod = useFinanceStore((state) => state.setPeriod);
+  const changeMonth = useFinanceStore((state) => state.changeMonth);
   const isLoadingData = useFinanceStore((state) => state.isLoadingData);
   const theme = useUIStore((state) => state.theme);
   const toggleTheme = useUIStore((state) => state.toggleTheme);
@@ -104,23 +105,39 @@ const PageContainer = ({
           </div>
         </div>
 
-        <div className="glass rounded-3xl px-3 py-2 flex items-center gap-3">
+        <div className="glass rounded-3xl p-1.5 flex items-center justify-between gap-2">
+          <button
+            type="button"
+            onClick={() => changeMonth(-1)}
+            disabled={isLoadingData}
+            className="w-12 h-12 flex items-center justify-center rounded-2xl bg-secondary/40 text-muted-foreground hover:bg-secondary hover:text-foreground tap-highlight-none transition-colors"
+            aria-label="Mês anterior"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+
           <button
             type="button"
             onClick={() => setMonthPickerOpen(true)}
-            className="w-full rounded-2xl px-3 py-2.5 bg-secondary/55 border border-border/50 flex items-center justify-between gap-3 tap-highlight-none"
+            className="flex-1 rounded-2xl px-3 py-2.5 bg-secondary/55 border border-border/50 flex flex-col items-center justify-center gap-1 tap-highlight-none"
             aria-label="Selecionar mês"
           >
-            <div className="flex items-center gap-2.5">
-              <CalendarDays className="w-[18px] h-[18px] text-muted-foreground" />
-              <div className="text-left">
-                <p className="text-subhead font-semibold text-foreground leading-tight">
-                  {getMonthName(currentMonth)} {currentYear}
-                </p>
-                <p className="text-caption text-muted-foreground leading-tight">Selecionar período</p>
-              </div>
+            <div className="flex items-center gap-2">
+              <CalendarDays className="w-[16px] h-[16px] text-muted-foreground" />
+              <p className="text-subhead font-semibold text-foreground leading-tight">
+                {getMonthName(currentMonth)} {currentYear}
+              </p>
             </div>
-            <ChevronDown className="w-4 h-4 text-muted-foreground" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => changeMonth(1)}
+            disabled={isLoadingData}
+            className="w-12 h-12 flex items-center justify-center rounded-2xl bg-secondary/40 text-muted-foreground hover:bg-secondary hover:text-foreground tap-highlight-none transition-colors"
+            aria-label="Próximo mês"
+          >
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
       </motion.div>

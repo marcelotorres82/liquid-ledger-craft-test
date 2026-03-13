@@ -2,62 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: 'SF Pro Text';
-  src: url('/assets/fonts/SF-Pro-Text-Regular.otf') format('opentype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro Text';
-  src: url('/assets/fonts/SF-Pro-Text-Medium.otf') format('opentype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro Text';
-  src: url('/assets/fonts/SF-Pro-Text-Semibold.otf') format('opentype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro Text';
-  src: url('/assets/fonts/SF-Pro-Text-Bold.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro Display';
-  src: url('/assets/fonts/SF-Pro-Display-Medium.otf') format('opentype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro Display';
-  src: url('/assets/fonts/SF-Pro-Display-Semibold.otf') format('opentype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro Display';
-  src: url('/assets/fonts/SF-Pro-Display-Bold.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
 @layer base {
   :root {
     color-scheme: light;
@@ -107,14 +51,14 @@
 
     --radius: 1rem;
 
-    /* Glass tokens */
-    --glass-bg: 0 0% 100% / 0.27;
-    --glass-border: 0 0% 100% / 0.66;
-    --glass-subtle-bg: 0 0% 100% / 0.22;
-    --glass-shadow: 216 34% 20% / 0.11;
-    --glass-blur: 38px;
-    --glass-inner-highlight: 0 0% 100% / 0.95;
-    --glass-refraction: 210 100% 72% / 0.24;
+    /* Glass tokens - Apple Liquid Glass */
+    --glass-bg: 0 0% 100% / 0.18;
+    --glass-border: 0 0% 100% / 0.45;
+    --glass-subtle-bg: 0 0% 100% / 0.12;
+    --glass-shadow: 216 34% 20% / 0.14;
+    --glass-blur: 48px;
+    --glass-inner-highlight: 0 0% 100% / 0.65;
+    --glass-refraction: 210 100% 72% / 0.18;
 
     /* Gradients */
     --gradient-income: linear-gradient(135deg, hsl(142 71% 45%), hsl(160 84% 39%));
@@ -168,12 +112,12 @@
     --input: 219 40% 28%;
     --ring: 211 100% 55%;
 
-    --glass-bg: 220 36% 12% / 0.26;
-    --glass-border: 0 0% 100% / 0.28;
-    --glass-subtle-bg: 220 34% 13% / 0.22;
-    --glass-shadow: 220 66% 4% / 0.48;
-    --glass-inner-highlight: 0 0% 100% / 0.2;
-    --glass-refraction: 202 100% 74% / 0.28;
+    --glass-bg: 220 36% 12% / 0.15;
+    --glass-border: 0 0% 100% / 0.15;
+    --glass-subtle-bg: 220 34% 13% / 0.10;
+    --glass-shadow: 220 66% 4% / 0.55;
+    --glass-inner-highlight: 0 0% 100% / 0.1;
+    --glass-refraction: 202 100% 74% / 0.15;
 
     --sidebar-background: 220 20% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -296,11 +240,13 @@
   }
 
   .glass-neutral {
-    background: hsl(var(--card) / 0.76);
-    border-color: hsl(var(--border) / 0.74);
+    background: hsl(var(--card) / 0.40);
+    backdrop-filter: blur(var(--glass-blur)) saturate(190%) contrast(1.03) brightness(1.06);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(190%) contrast(1.03) brightness(1.06);
+    border-color: hsl(var(--border) / 0.55);
     box-shadow:
       0 18px 38px hsl(220 20% 15% / 0.12),
-      inset 0 1px 0 hsl(0 0% 100% / 0.6);
+      inset 0 1px 0 hsl(0 0% 100% / 0.4);
   }
 
   .glass-neutral::before {
@@ -313,11 +259,13 @@
   }
 
   .dark .glass-neutral {
-    background: hsl(var(--card) / 0.68);
-    border-color: hsl(var(--border) / 0.66);
+    background: hsl(var(--card) / 0.25);
+    backdrop-filter: blur(var(--glass-blur)) saturate(190%) contrast(1.03) brightness(1.06);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(190%) contrast(1.03) brightness(1.06);
+    border-color: hsl(var(--border) / 0.35);
     box-shadow:
       0 20px 42px hsl(220 50% 2% / 0.48),
-      inset 0 1px 0 hsl(0 0% 100% / 0.2);
+      inset 0 1px 0 hsl(0 0% 100% / 0.12);
   }
 
   .dark .glass-neutral::before {

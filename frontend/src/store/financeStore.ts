@@ -66,6 +66,8 @@ interface FinanceStore {
     data_pagamento?: string | null;
     parcelas_total?: number;
     valor_primeira_parcela?: number;
+    mes_referencia?: number;
+    ano_referencia?: number;
   }) => Promise<void>;
   editDespesa: (
     id: number,
@@ -78,6 +80,8 @@ interface FinanceStore {
       data_pagamento?: string | null;
       parcelas_total?: number;
       valor_primeira_parcela?: number;
+      mes_referencia?: number;
+      ano_referencia?: number;
     }
   ) => Promise<void>;
   removeDespesa: (id: number) => Promise<void>;

@@ -263,7 +263,7 @@ export default async function handler(req, res) {
       // Buscar despesas fixas individuais para verificar status de pagamento
       prisma.despesa.findMany({
         where: { usuarioId: userId, tipo: 'fixa' },
-        select: { valorParcela: true, paga: true },
+        select: { valorParcela: true, pagamentos: { where: { mes, ano } } },
       }),
       // Buscar despesas avulsas individuais para verificar status de pagamento
       prisma.despesa.findMany({
@@ -312,7 +312,7 @@ export default async function handler(req, res) {
 
     // Calcular total de despesas pagas
     const despesasFixasPagas = despesasFixasIndividuais
-      .filter((d) => d.paga)
+      .filter((d) => d.pagamentos && d.pagamentos.length > 0)
       .reduce((sum, d) => sum + toNumber(d.valorParcela), 0);
     const despesasAvulsasPagas = despesasAvulsasIndividuais
       .filter((d) => d.paga)

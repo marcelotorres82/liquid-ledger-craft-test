@@ -48,7 +48,7 @@ const TransactionItem = ({
         onAmountClick();
       }}
       className={cn(
-        "expense-value-button shrink-0 tap-highlight-none inline-flex items-center justify-end w-[118px] text-right",
+        "expense-value-button shrink-0 tap-highlight-none inline-flex items-center justify-end w-auto whitespace-nowrap text-right",
         isStriked && "line-through opacity-70",
         type === "income" ? "text-income" : "text-expense"
       )}
@@ -59,7 +59,7 @@ const TransactionItem = ({
   ) : (
     <span
       className={cn(
-        "text-subhead font-semibold shrink-0 w-[118px] text-right",
+        "text-subhead font-semibold shrink-0 w-auto whitespace-nowrap text-right",
         isStriked && "line-through opacity-70",
         type === "income" ? "text-income" : "text-expense"
       )}
@@ -90,7 +90,7 @@ const TransactionItem = ({
         </p>
       </div>
 
-      <div className="flex items-center justify-end gap-2 shrink-0 min-w-[172px]">
+      <div className="flex items-center justify-end gap-2 shrink-0 min-w-0">
         {hasActions ? (
           <AnimatePresence>
             {showActions ? (

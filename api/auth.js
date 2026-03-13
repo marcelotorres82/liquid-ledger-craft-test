@@ -68,8 +68,12 @@ export default async function handler(req, res) {
         },
       });
     } catch (error) {
-      console.error('Login error:', error);
-      return res.status(500).json({ success: false, message: 'Erro no servidor' });
+      console.error('==== LOGIN ERROR DUMP ====');
+      console.error(error);
+      if (error.message) console.error('Message:', error.message);
+      if (error.stack) console.error('Stack:', error.stack);
+      console.error('===========================');
+      return res.status(500).json({ success: false, message: 'Erro no servidor: ' + String(error.message || error) });
     }
   }
 

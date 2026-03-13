@@ -113,6 +113,8 @@ export function createDespesa(payload: {
   data_pagamento?: string | null;
   parcelas_total?: number;
   valor_primeira_parcela?: number;
+  mes_referencia?: number;
+  ano_referencia?: number;
 }): Promise<{ success: boolean; id: number }> {
   return request<{ success: boolean; id: number }>('/despesas', {
     method: 'POST',
@@ -131,6 +133,8 @@ export function updateDespesa(
     data_pagamento?: string | null;
     parcelas_total?: number;
     valor_primeira_parcela?: number;
+    mes_referencia?: number;
+    ano_referencia?: number;
   }
 ): Promise<{ success: boolean }> {
   return request<{ success: boolean }>(`/despesas?id=${id}`, {

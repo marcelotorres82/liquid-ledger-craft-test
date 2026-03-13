@@ -1,7 +1,9 @@
 // Prisma Schema para App Financeiro
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  engineType    = "library"
+  binaryTargets = ["native", "rhel-openssl-1.0.x", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
@@ -61,13 +63,31 @@ model Despesa {
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @updatedAt @map("updated_at")
 
-  // Relação com usuário
+  // Relação com usuário e pagamentos da despesa
   usuarioId           Int      @map("usuario_id")
   usuario             Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  pagamentos          PagamentoDespesa[]
 
   @@index([usuarioId, tipo])
   @@index([dataInicio])
   @@map("despesas")
+}
+
+model PagamentoDespesa {
+  id              Int      @id @default(autoincrement())
+  despesaId       Int      @map("despesa_id")
+  mes             Int
+  ano             Int
+  valorPago       Decimal  @map("valor_pago") @db.Decimal(10, 2)
+  dataPagamento   DateTime @default(now()) @map("data_pagamento") @db.Date
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  despesa         Despesa  @relation(fields: [despesaId], references: [id], onDelete: Cascade)
+
+  @@unique([despesaId, mes, ano])
+  @@index([despesaId])
+  @@map("pagamentos_despesa")
 }
 
 model Insight {

@@ -107,6 +107,8 @@ const Expenses = ({ onLogout }: ExpensesProps) => {
       data_pagamento: nextPaid ? getTodayISODate() : null,
       parcelas_total: entry.parcelas_total || 1,
       valor_primeira_parcela: entry.valor_primeira_parcela ?? undefined,
+      mes_referencia: currentMonth,
+      ano_referencia: currentYear,
     });
   };
 
@@ -126,13 +128,19 @@ const Expenses = ({ onLogout }: ExpensesProps) => {
     parcelas_total?: number;
     valor_primeira_parcela?: number;
   }) => {
+    const fullPayload = {
+      ...payload,
+      mes_referencia: currentMonth,
+      ano_referencia: currentYear,
+    };
+
     if (editing) {
-      await editDespesa(editing.id, payload);
+      await editDespesa(editing.id, fullPayload);
       setEditing(null);
       return;
     }
 
-    await addDespesa(payload);
+    await addDespesa(fullPayload);
   };
 
   return (
