@@ -9,8 +9,8 @@
     "ui:install": "npm install --prefix frontend",
     "ui:build": "npm run build --prefix frontend && mkdir -p public/app && find public/app -mindepth 1 -delete && cp -R frontend/dist/. public/app/",
     "deploy": "vercel --prod",
-    "vercel-build": "prisma generate && npm run ui:build",
-    "postinstall": "prisma generate",
+    "vercel-build": "npm run ui:install && prisma generate && npm run ui:build",
+    "postinstall": "npm run ui:install && prisma generate",
     "prisma:studio": "prisma studio --schema lib/prisma/schema.prisma",
     "prisma:seed": "node lib/prisma/seed.js"
   },
