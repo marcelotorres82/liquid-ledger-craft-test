@@ -16,11 +16,11 @@
   "iconUrl": "https://app-financeiro-ten-rose.vercel.app/app/icons/icon-512.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
-    "path": "/mnt/dados/app-financeiro/mobile-apk/twa/app-financeiro-twa/android.keystore",
+    "path": "android_new.keystore",
     "alias": "android"
   },
-  "appVersionName": "4",
-  "appVersionCode": 4,
+  "appVersionName": "8",
+  "appVersionCode": 8,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://app-financeiro-ten-rose.vercel.app/app/manifest.webmanifest",
@@ -35,12 +35,14 @@
   "fullScopeUrl": "https://app-financeiro-ten-rose.vercel.app/app/",
   "minSdkVersion": 21,
   "orientation": "default",
-  "fingerprints": [],
+  "fingerprints": [
+    "1A:A3:6F:2C:61:6B:D8:AA:F8:5D:C1:08:A7:4F:26:91:59:EC:EA:3C:E4:19:0A:32:28:74:87:B6:DB:8D:8B:1F"
+  ],
   "additionalTrustedOrigins": [],
   "retainedBundles": [],
   "protocolHandlers": [],
   "fileHandlers": [],
   "launchHandlerClientMode": "",
   "displayOverride": [],
-  "appVersion": "4"
+  "appVersion": "8"
 }
