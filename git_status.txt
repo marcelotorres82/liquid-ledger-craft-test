@@ -1,0 +1,56 @@
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   mobile-apk/twa/app-financeiro-twa/app/build.gradle
+	modified:   mobile-apk/twa/app-financeiro-twa/app/src/main/res/drawable-hdpi/ic_notification_icon.png
+	modified:   mobile-apk/twa/app-financeiro-twa/app/src/main/res/drawable-hdpi/splash.png
+	modified:   mobile-apk/twa/app-financeiro-twa/app/src/main/res/drawable-mdpi/ic_notification_icon.png
+	modified:   mobile-apk/twa/app-financeiro-twa/app/src/main/res/drawable-mdpi/splash.png
+	modified:   mobile-apk/twa/app-financeiro-twa/app/src/main/res/drawable-xhdpi/ic_notification_icon.png
+	modified:   mobile-apk/twa/app-financeiro-twa/app/src/main/res/drawable-xhdpi/splash.png
+	modified:   mobile-apk/twa/app-financeiro-twa/app/src/main/res/drawable-xxhdpi/ic_notification_icon.png
+	modified:   mobile-apk/twa/app-financeiro-twa/app/src/main/res/drawable-xxhdpi/splash.png
+	modified:   mobile-apk/twa/app-financeiro-twa/app/src/main/res/drawable-xxxhdpi/ic_notification_icon.png
+	modified:   mobile-apk/twa/app-financeiro-twa/app/src/main/res/drawable-xxxhdpi/splash.png
+	modified:   mobile-apk/twa/app-financeiro-twa/app/src/main/res/mipmap-hdpi/ic_launcher.png
+	modified:   mobile-apk/twa/app-financeiro-twa/app/src/main/res/mipmap-mdpi/ic_launcher.png
+	modified:   mobile-apk/twa/app-financeiro-twa/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+	modified:   mobile-apk/twa/app-financeiro-twa/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+	modified:   mobile-apk/twa/app-financeiro-twa/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+	modified:   mobile-apk/twa/app-financeiro-twa/app/src/main/res/raw/web_app_manifest.json
+	modified:   mobile-apk/twa/app-financeiro-twa/manifest-checksum.txt
+	modified:   mobile-apk/twa/app-financeiro-twa/store_icon.png
+	modified:   mobile-apk/twa/app-financeiro-twa/twa-manifest.json
+	modified:   mobile-apk/twa/app/src/main/AndroidManifest.xml
+	modified:   mobile-apk/twa/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+	modified:   mobile-apk/twa/app/src/main/res/xml/shortcuts.xml
+	modified:   mobile-apk/twa/gradle/wrapper/gradle-wrapper.properties
+	modified:   public/.well-known/assetlinks.json
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	git_status.txt
+	mobile-apk/twa/app-financeiro-twa/build.log
+	mobile-apk/twa/app-financeiro-twa/build_DAL.log
+	mobile-apk/twa/app-financeiro-twa/build_final.log
+	mobile-apk/twa/app-financeiro-twa/build_gradle.log
+	mobile-apk/twa/app-financeiro-twa/build_icon_update.log
+	mobile-apk/twa/app-financeiro-twa/build_new.log
+	mobile-apk/twa/app-financeiro-twa/keystore_info.txt
+	mobile-apk/twa/app/src/main/res/drawable-hdpi/
+	mobile-apk/twa/app/src/main/res/drawable-mdpi/
+	mobile-apk/twa/app/src/main/res/drawable-xhdpi/
+	mobile-apk/twa/app/src/main/res/drawable-xxhdpi/
+	mobile-apk/twa/app/src/main/res/drawable-xxxhdpi/
+	mobile-apk/twa/app/src/main/res/mipmap-hdpi/
+	mobile-apk/twa/app/src/main/res/mipmap-mdpi/
+	mobile-apk/twa/app/src/main/res/mipmap-xhdpi/
+	mobile-apk/twa/app/src/main/res/mipmap-xxhdpi/
+	mobile-apk/twa/app/src/main/res/mipmap-xxxhdpi/
+	mobile-apk/twa/app/src/main/res/raw/
+	output_debug.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")

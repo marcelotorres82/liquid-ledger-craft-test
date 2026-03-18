@@ -9,7 +9,7 @@
 node_modules
 frontend/node_modules
 frontend/dist
-frontend/package-lock.json
+# frontend/package-lock.json (Keep it visible for Vercel detection)
 .vercel
 
 # Local extraction / assets not needed in deploy

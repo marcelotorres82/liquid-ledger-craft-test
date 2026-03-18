@@ -145,25 +145,25 @@ const Expenses = ({ onLogout }: ExpensesProps) => {
 
   return (
     <PageContainer title="Despesas" subtitle="Para onde vai seu dinheiro" onLogout={onLogout} centerHeading>
-      <GlassCard delay={0.1} className="mb-4 text-center">
-        <p className="text-caption text-muted-foreground uppercase tracking-widest mb-1">Total do mês</p>
-        <div className="text-large-title text-expense">
+      <GlassCard delay={0.1} className="mb-6 text-center oppo-card glass-refractive py-8">
+        <p className="text-caption text-muted-foreground uppercase tracking-[0.2em] mb-2">Total do mês</p>
+        <div className="text-large-title text-expense oppo-glow-text">
           <AnimatedNumber value={total} prefix="R$ " />
         </div>
-        <p className="text-caption text-muted-foreground mt-1">
+        <p className="text-caption text-muted-foreground mt-2 opacity-80">
           {allExpenses.length} {allExpenses.length === 1 ? 'lançamento' : 'lançamentos'}
           {' · '}
           {paidCount} {paidCount === 1 ? 'pago' : 'pagos'}
         </p>
       </GlassCard>
 
-      <GlassCard delay={0.2} className="mb-4">
+      <GlassCard delay={0.2} className="mb-4 oppo-card glass-refractive">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-headline text-foreground">Não pagas</h3>
           <span className="text-caption text-muted-foreground">{unpaidExpenses.length}</span>
         </div>
 
-        <div className="divide-y divide-border">
+        <div className="divide-y divide-border/40">
           <AnimatePresence>
             {unpaidExpenses.length === 0 && (
               <p className="text-subhead text-muted-foreground py-3">Nenhuma conta pendente no período.</p>
@@ -194,13 +194,13 @@ const Expenses = ({ onLogout }: ExpensesProps) => {
         </div>
       </GlassCard>
 
-      <GlassCard delay={0.24}>
+      <GlassCard delay={0.24} className="mb-4">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-headline text-foreground">Pagas</h3>
           <span className="text-caption text-muted-foreground">{paidExpenses.length}</span>
         </div>
 
-        <div className="divide-y divide-border">
+        <div className="divide-y divide-border/40">
           <AnimatePresence>
             {paidExpenses.length === 0 && (
               <p className="text-subhead text-muted-foreground py-3">Nenhuma conta marcada como paga.</p>
@@ -235,11 +235,11 @@ const Expenses = ({ onLogout }: ExpensesProps) => {
       {despesasParceladas.length > 0 && (
         <GlassCard delay={0.3} className="mt-4">
           <h3 className="text-headline text-foreground mb-3">Parcelamentos ativos</h3>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {despesasParceladas.map((item) => {
               const parsed = parseExpenseDescription(item.descricao, item.tipo);
               return (
-                <div key={`parcelamento-${item.id}`} className="space-y-1">
+                <div key={`parcelamento-${item.id}`} className="space-y-1.5">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-subhead font-medium text-foreground">{parsed.description}</p>
                     <p className="text-subhead text-expense font-semibold">
@@ -250,9 +250,9 @@ const Expenses = ({ onLogout }: ExpensesProps) => {
                     Parcela {item.parcela_atual || 1} de {item.parcelas_total || 1}
                   </p>
                   {Number.isFinite(Number(item.progresso)) && (
-                    <div className="h-2 rounded-full bg-secondary overflow-hidden">
+                    <div className="h-1.5 rounded-full bg-secondary/30 overflow-hidden">
                       <div
-                        className="h-full rounded-full gradient-expense"
+                        className="h-full rounded-full gradient-expense shadow-[0_0_8px_rgba(239,68,68,0.3)]"
                         style={{ width: `${Math.max(0, Math.min(100, Number(item.progresso)))}%` }}
                       />
                     </div>

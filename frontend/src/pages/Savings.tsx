@@ -31,17 +31,17 @@ const Savings = ({ onLogout }: SavingsProps) => {
 
   return (
     <PageContainer title="Caixinhas" subtitle="Metas inteligentes de economia" onLogout={onLogout}>
-      <GlassCard delay={0.1} className="mb-6 text-center">
-        <p className="text-caption text-muted-foreground uppercase tracking-widest mb-1">Total acumulado</p>
-        <div className="text-large-title text-savings">
+      <GlassCard delay={0.1} className="mb-6 text-center oppo-card glass-refractive py-8">
+        <p className="text-caption text-muted-foreground uppercase tracking-[0.2em] mb-2">Total acumulado</p>
+        <div className="text-large-title text-savings oppo-glow-text">
           <AnimatedNumber value={totalSaved} prefix="R$ " />
         </div>
-        <p className="text-caption text-muted-foreground mt-1">{periodLabel}</p>
+        <p className="text-caption text-muted-foreground mt-2 opacity-80">{periodLabel}</p>
       </GlassCard>
 
       <div className="space-y-3">
         {goals.length === 0 && (
-          <GlassCard>
+          <GlassCard className="oppo-card glass-refractive">
             <p className="text-subhead text-muted-foreground">Sem dados de caixinhas para o período selecionado.</p>
           </GlassCard>
         )}
@@ -53,12 +53,14 @@ const Savings = ({ onLogout }: SavingsProps) => {
           const hasPlus = Number(goal.meta_plus || 0) > 0;
 
           return (
-            <GlassCard key={goal.categoria} delay={0.15 + index * 0.06}>
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-2xl">{emojiByCategory[goal.categoria] || '💰'}</span>
+            <GlassCard key={goal.categoria} delay={0.15 + index * 0.06} className="relative overflow-hidden oppo-card glass-refractive">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-2xl liquid-glass-sm flex items-center justify-center text-2xl drop-shadow-lg border border-white/5">
+                  {emojiByCategory[goal.categoria] || '💰'}
+                </div>
                 <div className="flex-1">
-                  <p className="text-headline text-foreground">{goal.categoria}</p>
-                  <p className="text-caption text-muted-foreground">
+                  <p className="text-headline font-bold text-foreground">{goal.categoria}</p>
+                  <p className="text-caption font-bold text-muted-foreground/80 tracking-tight">
                     R$ {Number(goal.valor_acumulado || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     {hasMeta
                       ? ` de R$ ${Number(goal.meta || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
@@ -66,32 +68,40 @@ const Savings = ({ onLogout }: SavingsProps) => {
                   </p>
                 </div>
                 {hasMeta && (
-                  <span className="text-subhead font-semibold text-foreground">{Math.round(percentMeta)}%</span>
+                  <div className="text-right">
+                    <span className="text-subhead font-black text-foreground block">{Math.round(percentMeta)}%</span>
+                    <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground/60">Concluído</span>
+                  </div>
                 )}
               </div>
 
               {hasMeta ? (
-                <>
+                <div className="space-y-3">
                   <GlassProgressBar
                     value={Number(goal.valor_acumulado || 0)}
                     max={Number(goal.meta || 1)}
                     variant="savings"
                   />
-                  <p className="text-caption text-muted-foreground mt-2">
+                  <p className="text-caption font-bold text-muted-foreground/70 tracking-tight">
                     {Number(goal.faltante_meta || 0) > 0
                       ? `Faltam R$ ${Number(goal.faltante_meta || 0).toLocaleString('pt-BR', {
                           minimumFractionDigits: 2,
-                        })} para a meta principal`
-                      : 'Meta principal concluída'}
+                        })} para a meta`
+                      : '✅ Meta principal batida!'}
                   </p>
-                </>
+                </div>
               ) : (
-                <p className="text-caption text-muted-foreground">Meta principal não definida para esta categoria.</p>
+                <div className="py-2 px-3 rounded-xl bg-white/5 border border-white/5">
+                   <p className="text-caption font-medium italic text-muted-foreground/60 text-center">Defina uma meta para acompanhar o progresso</p>
+                </div>
               )}
 
               {hasPlus && (
-                <div className="mt-3">
-                  <p className="text-caption text-muted-foreground mb-1">Meta plus: {Math.round(percentPlus)}%</p>
+                <div className="mt-5 pt-4 border-t border-white/5">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Meta Plus</p>
+                    <p className="text-caption font-black text-income">{Math.round(percentPlus)}%</p>
+                  </div>
                   <GlassProgressBar
                     value={Number(goal.valor_acumulado || 0)}
                     max={Number(goal.meta_plus || 1)}

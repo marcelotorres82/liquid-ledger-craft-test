@@ -1,6 +1,4 @@
-const API_BASE = window.location.hostname === 'localhost' 
-  ? 'http://localhost:3000/api' 
-  : '/api';
+const API_BASE = '/api';
 
 document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();

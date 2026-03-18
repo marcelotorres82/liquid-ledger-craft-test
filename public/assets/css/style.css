@@ -232,8 +232,8 @@ textarea {
   background: var(--glass-bg);
   border: 1px solid var(--glass-stroke);
   box-shadow: var(--shadow-soft);
-  backdrop-filter: blur(30px) saturate(180%) contrast(1.04);
-  -webkit-backdrop-filter: blur(30px) saturate(180%) contrast(1.04);
+  backdrop-filter: blur(40px) saturate(240%) contrast(1.1) url(#liquid-distort);
+  -webkit-backdrop-filter: blur(40px) saturate(240%) contrast(1.1);
 }
 
 .login-card::before,
@@ -251,9 +251,10 @@ textarea {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(132deg, var(--glass-highlight) 0%, transparent 46%);
+  background: linear-gradient(132deg, var(--glass-highlight) 0%, transparent 40%, rgba(255,255,255,0.05) 100%);
   pointer-events: none;
-  opacity: 0.66;
+  opacity: 0.8;
+  z-index: 10;
 }
 
 /* Login */
@@ -270,12 +271,12 @@ textarea {
 }
 
 .login-card {
-  border-radius: 36px;
-  padding: 34px 28px 30px;
-  border-color: var(--glass-edge);
+  border-radius: 42px;
+  padding: 40px 32px 34px;
+  border-color: rgba(255, 255, 255, 0.4);
   box-shadow:
-    var(--shadow-soft),
-    inset 0 1px 0 rgba(255, 255, 255, 0.74),
+    var(--shadow-floating),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
     inset 0 -1px 0 rgba(10, 132, 255, 0.2);
 }
 

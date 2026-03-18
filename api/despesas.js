@@ -1,5 +1,7 @@
 import prisma from '../lib/prisma.js';
 import { verifyToken } from '../lib/auth.js';
+import { setCorsHeaders } from '../lib/cors.js';
+import { handleApiError } from '../lib/errorHandler.js';
 
 const TIPOS_DESPESA = new Set(['fixa', 'parcelada', 'avulsa']);
 
@@ -172,9 +174,7 @@ function validateDespesaPayload(payload) {
 }
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  setCorsHeaders(req, res);
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -273,8 +273,7 @@ export default async function handler(req, res) {
         total_geral: totalFixas + totalAvulsas + totalParceladas,
       });
     } catch (error) {
-      console.error('Erro ao buscar despesas:', error);
-      return res.status(500).json({ success: false, message: 'Erro no servidor' });
+      return handleApiError(error, res);
     }
   }
 
@@ -286,34 +285,36 @@ export default async function handler(req, res) {
         return res.status(400).json({ success: false, message: parsed.error });
       }
 
-      const despesa = await prisma.despesa.create({
-        data: {
-          usuarioId: userId,
-          ...parsed.data,
-        },
-      });
-      
-      const isRecurring = despesa.tipo === 'fixa' || despesa.tipo === 'parcelada';
-      if (isRecurring && parsed.contexto.mes && parsed.contexto.ano && despesa.paga) {
-        await prisma.pagamentoDespesa.create({
+      const despesaId = await prisma.$transaction(async (tx) => {
+        const despesa = await tx.despesa.create({
           data: {
-             despesaId: despesa.id,
-             mes: parsed.contexto.mes,
-             ano: parsed.contexto.ano,
-             valorPago: despesa.valorParcela,
-             dataPagamento: despesa.dataPagamento || new Date()
-          }
+            usuarioId: userId,
+            ...parsed.data,
+          },
         });
-      }
+        
+        const isRecurring = despesa.tipo === 'fixa' || despesa.tipo === 'parcelada';
+        if (isRecurring && parsed.contexto.mes && parsed.contexto.ano && despesa.paga) {
+          await tx.pagamentoDespesa.create({
+            data: {
+               despesaId: despesa.id,
+               mes: parsed.contexto.mes,
+               ano: parsed.contexto.ano,
+               valorPago: despesa.valorParcela,
+               dataPagamento: despesa.dataPagamento || new Date()
+            }
+          });
+        }
+        return despesa.id;
+      });
 
       return res.status(201).json({
         success: true,
         message: 'Despesa adicionada',
-        id: despesa.id,
+        id: despesaId,
       });
     } catch (error) {
-      console.error('Erro ao criar despesa:', error);
-      return res.status(500).json({ success: false, message: 'Erro no servidor' });
+      return handleApiError(error, res);
     }
   }
 
@@ -330,56 +331,57 @@ export default async function handler(req, res) {
         return res.status(400).json({ success: false, message: parsed.error });
       }
 
-      const existing = await prisma.despesa.findFirst({
-        where: { id, usuarioId: userId },
-      });
-
-      if (!existing) {
-        return res.status(404).json({
-          success: false,
-          message: 'Despesa não encontrada',
+      await prisma.$transaction(async (tx) => {
+        const existing = await tx.despesa.findFirst({
+          where: { id, usuarioId: userId },
         });
-      }
 
-      await prisma.despesa.update({
-        where: { id },
-        data: parsed.data,
+        if (!existing) {
+          throw new Error('Despesa não encontrada');
+        }
+
+        await tx.despesa.update({
+          where: { id },
+          data: parsed.data,
+        });
+
+        const isRecurring = existing.tipo === 'fixa' || existing.tipo === 'parcelada';
+        
+        if (isRecurring && parsed.contexto.mes && parsed.contexto.ano) {
+           if (parsed.data.paga) {
+             await tx.pagamentoDespesa.upsert({
+               where: {
+                 despesaId_mes_ano: { despesaId: id, mes: parsed.contexto.mes, ano: parsed.contexto.ano }
+               },
+               create: {
+                 despesaId: id,
+                 mes: parsed.contexto.mes,
+                 ano: parsed.contexto.ano,
+                 valorPago: parsed.data.valorParcela,
+                 dataPagamento: parsed.data.dataPagamento || new Date()
+               },
+               update: {
+                 valorPago: parsed.data.valorParcela,
+                 dataPagamento: parsed.data.dataPagamento || new Date()
+               }
+             });
+           } else {
+             await tx.pagamentoDespesa.deleteMany({
+               where: { despesaId: id, mes: parsed.contexto.mes, ano: parsed.contexto.ano }
+             });
+           }
+        }
       });
-
-      const isRecurring = existing.tipo === 'fixa' || existing.tipo === 'parcelada';
-      
-      if (isRecurring && parsed.contexto.mes && parsed.contexto.ano) {
-         if (parsed.data.paga) {
-           await prisma.pagamentoDespesa.upsert({
-             where: {
-               despesaId_mes_ano: { despesaId: id, mes: parsed.contexto.mes, ano: parsed.contexto.ano }
-             },
-             create: {
-               despesaId: id,
-               mes: parsed.contexto.mes,
-               ano: parsed.contexto.ano,
-               valorPago: parsed.data.valorParcela,
-               dataPagamento: parsed.data.dataPagamento || new Date()
-             },
-             update: {
-               valorPago: parsed.data.valorParcela,
-               dataPagamento: parsed.data.dataPagamento || new Date()
-             }
-           });
-         } else {
-           await prisma.pagamentoDespesa.deleteMany({
-             where: { despesaId: id, mes: parsed.contexto.mes, ano: parsed.contexto.ano }
-           });
-         }
-      }
 
       return res.status(200).json({
         success: true,
         message: 'Despesa atualizada',
       });
     } catch (error) {
-      console.error('Erro ao atualizar despesa:', error);
-      return res.status(500).json({ success: false, message: 'Erro no servidor' });
+      if (error.message === 'Despesa não encontrada') {
+        return res.status(404).json({ success: false, message: error.message });
+      }
+      return handleApiError(error, res);
     }
   }
 
@@ -407,8 +409,7 @@ export default async function handler(req, res) {
         message: 'Despesa removida',
       });
     } catch (error) {
-      console.error('Erro ao deletar despesa:', error);
-      return res.status(500).json({ success: false, message: 'Erro no servidor' });
+      return handleApiError(error, res);
     }
   }
 

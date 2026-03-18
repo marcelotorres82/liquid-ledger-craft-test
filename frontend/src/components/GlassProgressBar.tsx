@@ -8,6 +8,12 @@ interface GlassProgressBarProps {
   className?: string;
 }
 
+const glowMap = {
+  income: "shadow-[0_0_8px_rgba(16,185,129,0.3)]",
+  expense: "shadow-[0_0_8px_rgba(239,68,68,0.3)]",
+  savings: "shadow-[0_0_8px_rgba(59,130,246,0.3)]",
+};
+
 const gradientMap = {
   income: "gradient-income",
   expense: "gradient-expense",
@@ -18,12 +24,12 @@ const GlassProgressBar = ({ value, max, variant = "savings", className }: GlassP
   const pct = Math.min((value / max) * 100, 100);
 
   return (
-    <div className={cn("h-2.5 rounded-full bg-secondary overflow-hidden", className)}>
+    <div className={cn("h-1.5 rounded-full bg-secondary/30 overflow-hidden", className)}>
       <motion.div
         initial={{ width: 0 }}
         animate={{ width: `${pct}%` }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-        className={cn("h-full rounded-full", gradientMap[variant])}
+        className={cn("h-full rounded-full", gradientMap[variant], glowMap[variant])}
       />
     </div>
   );

@@ -67,35 +67,37 @@ const Income = ({ onLogout }: IncomeProps) => {
 
   return (
     <PageContainer title="Receitas" subtitle="Entradas de renda do período" onLogout={onLogout}>
-      <GlassCard delay={0.1} className="mb-6 text-center">
-        <p className="text-caption text-muted-foreground uppercase tracking-widest mb-1">Total do mês</p>
-        <div className="text-large-title text-income">
+      <GlassCard delay={0.1} className="mb-6 text-center oppo-card glass-refractive py-8">
+        <p className="text-caption text-muted-foreground uppercase tracking-[0.2em] mb-2">Total do mês</p>
+        <div className="text-large-title text-income oppo-glow-text">
           <AnimatedNumber value={total} prefix="R$ " />
         </div>
-        <p className="text-caption text-muted-foreground mt-1">{entries.length} lançamentos</p>
+        <p className="text-caption text-muted-foreground mt-2 opacity-80">{entries.length} lançamentos</p>
       </GlassCard>
 
-      <GlassCard delay={0.2} className="divide-y divide-border">
-        <AnimatePresence>
-          {entries.length === 0 && <p className="text-subhead text-muted-foreground py-3">Nenhuma receita cadastrada.</p>}
+      <GlassCard delay={0.2} className="mb-4">
+        <div className="divide-y divide-border/40">
+          <AnimatePresence>
+            {entries.length === 0 && <p className="text-subhead text-muted-foreground py-3">Nenhuma receita cadastrada.</p>}
 
-          {entries.map((entry, index) => (
-            <TransactionItem
-              key={entry.id}
-              icon={getIncomeIcon(entry.descricao)}
-              title={entry.descricao}
-              subtitle={`${entry.tipo === 'fixa' ? 'Receita fixa' : 'Receita variável'} · ${formatDate(entry.data_registro)}`}
-              amount={entry.valor}
-              type="income"
-              delay={0.22 + index * 0.04}
-              onEdit={() => {
-                setEditing(entry);
-                setSheetOpen(true);
-              }}
-              onDelete={() => handleDelete(entry.id)}
-            />
-          ))}
-        </AnimatePresence>
+            {entries.map((entry, index) => (
+              <TransactionItem
+                key={entry.id}
+                icon={getIncomeIcon(entry.descricao)}
+                title={entry.descricao}
+                subtitle={`${entry.tipo === 'fixa' ? 'Receita fixa' : 'Receita variável'} · ${formatDate(entry.data_registro)}`}
+                amount={entry.valor}
+                type="income"
+                delay={0.22 + index * 0.04}
+                onEdit={() => {
+                  setEditing(entry);
+                  setSheetOpen(true);
+                }}
+                onDelete={() => handleDelete(entry.id)}
+              />
+            ))}
+          </AnimatePresence>
+        </div>
       </GlassCard>
 
       {error && <p className="text-caption text-destructive mt-4">{error}</p>}

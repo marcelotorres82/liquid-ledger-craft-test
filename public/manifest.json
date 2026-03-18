@@ -9,9 +9,9 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "assets/icons/app-icon.png",
+      "src": "assets/icons/app-icon.svg",
       "sizes": "192x192 512x512",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ]

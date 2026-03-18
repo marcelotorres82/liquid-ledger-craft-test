@@ -48,9 +48,9 @@ const TransactionItem = ({
         onAmountClick();
       }}
       className={cn(
-        "expense-value-button shrink-0 tap-highlight-none inline-flex items-center justify-end w-auto whitespace-nowrap text-right",
+        "expense-value-button shrink-0 tap-highlight-none inline-flex items-center justify-end w-auto whitespace-nowrap text-right font-black",
         isStriked && "line-through opacity-70",
-        type === "income" ? "text-income" : "text-expense"
+        type === "income" ? "text-income drop-shadow-[0_2px_8px_rgba(16,185,129,0.3)]" : "text-expense drop-shadow-[0_2px_8px_rgba(239,68,68,0.3)]"
       )}
       aria-label={`Editar ${title}`}
     >
@@ -59,9 +59,9 @@ const TransactionItem = ({
   ) : (
     <span
       className={cn(
-        "text-subhead font-semibold shrink-0 w-auto whitespace-nowrap text-right",
+        "text-subhead font-black shrink-0 w-auto whitespace-nowrap text-right",
         isStriked && "line-through opacity-70",
-        type === "income" ? "text-income" : "text-expense"
+        type === "income" ? "text-income drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]" : "text-expense drop-shadow-[0_0_8px_rgba(239,68,68,0.3)]"
       )}
     >
       {amountText}
@@ -78,14 +78,14 @@ const TransactionItem = ({
       className={cn("flex items-center gap-3 py-3", hasActions && "cursor-pointer")}
       onClick={hasActions ? () => setShowActions((v) => !v) : undefined}
     >
-      <div className="w-10 h-10 rounded-full bg-secondary/85 border border-border/70 flex items-center justify-center text-muted-foreground shrink-0">
-        {icon}
+      <div className="w-11 h-11 rounded-2xl liquid-glass-sm border border-white/5 flex items-center justify-center text-muted-foreground/80 shrink-0 shadow-sm">
+        <div className="scale-110 drop-shadow-md">{icon}</div>
       </div>
       <div className="flex-1 min-w-0">
-        <p className={cn("text-subhead font-medium text-foreground truncate", isStriked && "line-through opacity-70")}>
+        <p className={cn("text-subhead font-bold text-foreground truncate tracking-tight", isStriked && "line-through opacity-70")}>
           {title}
         </p>
-        <p className={cn("text-caption text-muted-foreground", isStriked && "line-through opacity-65")}>
+        <p className={cn("text-[11px] font-bold text-muted-foreground/60 uppercase tracking-widest", isStriked && "line-through opacity-65")}>
           {subtitle}
         </p>
       </div>

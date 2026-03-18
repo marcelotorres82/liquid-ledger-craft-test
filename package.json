@@ -4,7 +4,7 @@
   "description": "App de controle financeiro com IA",
   "type": "module",
   "scripts": {
-    "dev": "npm run ui:build && npm run dev:vercel",
+    "start-local": "npm run ui:build && npx vercel dev --listen 3001",
     "dev:vercel": "vercel dev",
     "ui:install": "npm install --prefix frontend",
     "ui:build": "npm run build --prefix frontend && mkdir -p public/app && find public/app -mindepth 1 -delete && cp -R frontend/dist/. public/app/",
@@ -23,8 +23,10 @@
     "@prisma/client": "^5.20.0",
     "bcryptjs": "^2.4.3",
     "cookie": "^0.6.0",
+    "dotenv": "^17.3.1",
     "jsonwebtoken": "^9.0.2",
-    "pg": "^8.16.3"
+    "pg": "^8.16.3",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "prisma": "^5.20.0",

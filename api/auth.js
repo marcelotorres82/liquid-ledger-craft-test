@@ -1,12 +1,12 @@
 import prisma from '../lib/prisma.js';
 import bcrypt from 'bcryptjs';
 import { generateToken, createTokenCookie, clearTokenCookie, verifyToken } from '../lib/auth.js';
+import { setCorsHeaders } from '../lib/cors.js';
+import { handleApiError, AppError } from '../lib/errorHandler.js';
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  console.log('API Request:', req.method, req.url);
+  setCorsHeaders(req, res);
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -68,12 +68,7 @@ export default async function handler(req, res) {
         },
       });
     } catch (error) {
-      console.error('==== LOGIN ERROR DUMP ====');
-      console.error(error);
-      if (error.message) console.error('Message:', error.message);
-      if (error.stack) console.error('Stack:', error.stack);
-      console.error('===========================');
-      return res.status(500).json({ success: false, message: 'Erro no servidor: ' + String(error.message || error) });
+      return handleApiError(error, res);
     }
   }
 
@@ -110,7 +105,7 @@ export default async function handler(req, res) {
         user,
       });
     } catch (error) {
-      return res.status(500).json({ success: false, message: 'Erro no servidor' });
+      return handleApiError(error, res);
     }
   }
 

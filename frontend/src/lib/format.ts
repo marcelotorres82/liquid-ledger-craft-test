@@ -43,11 +43,9 @@ export function getShortMonthName(month: number): string {
 
 export function getReferencePeriod(): { month: number; year: number } {
   const now = new Date();
-  const reference = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-
   return {
-    month: reference.getMonth() + 1,
-    year: reference.getFullYear(),
+    month: now.getMonth() + 1,
+    year: now.getFullYear(),
   };
 }
 

@@ -78,14 +78,9 @@ const App = () => {
 
   return (
     <HashRouter>
-      <div className="relative min-h-screen bg-background">
-        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-          <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-primary/5 blur-3xl" />
-          <div className="absolute top-1/3 -right-20 w-72 h-72 rounded-full bg-income/5 blur-3xl" />
-          <div className="absolute bottom-20 left-10 w-64 h-64 rounded-full bg-savings/5 blur-3xl" />
-        </div>
-
+      <div className="relative min-h-screen selection:bg-primary/20">
         <div className="relative z-10">
+
           <AnimatePresence mode="wait">
             <Routes>
               <Route path="/" element={<Dashboard onLogout={handleLogout} />} />

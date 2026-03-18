@@ -1,0 +1,22 @@
+total 212
+drwxr-xr-x. 1 marcelo marcelo    348 mar 14 10:27 .
+drwxrwxrwx. 1 marcelo marcelo     38 mar 12 20:24 ..
+drwxr-xr-x. 1 marcelo marcelo    104 mar 12 20:48 api
+-rw-r--r--. 1 marcelo marcelo   1759 mar 13 07:32 .env
+-rw-r--r--. 1 marcelo marcelo   1377 mar 12 20:24 .env.example
+drwxr-xr-x. 1 marcelo marcelo    322 mar 13 08:27 frontend
+drwxr-xr-x. 1 marcelo marcelo    150 mar 13 08:43 .git
+-rw-r--r--. 1 marcelo marcelo    815 mar 12 21:03 .gitignore
+drwxr-xr-x. 1 marcelo marcelo     54 mar 12 20:24 lib
+drwxr-xr-x. 1 marcelo marcelo     42 mar 12 20:24 mobile-apk
+drwxr-xr-x. 1 marcelo marcelo   5094 mar 13 07:47 node_modules
+-rw-r--r--. 1 marcelo marcelo      0 mar 14 10:27 output_debug.txt
+-rw-r--r--. 1 marcelo marcelo   1100 mar 13 07:51 package.json
+-rw-r--r--. 1 marcelo marcelo 179299 mar 13 07:47 package-lock.json
+drwxr-xr-x. 1 marcelo marcelo    176 mar 12 20:26 public
+-rw-r--r--. 1 marcelo marcelo   6424 mar 12 20:24 README.md
+drwxr-xr-x. 1 marcelo marcelo     62 mar 12 21:32 scripts
+-rw-r--r--. 1 marcelo marcelo    735 mar 12 23:05 test-db.js
+drwxr-xr-x. 1 marcelo marcelo     70 mar 12 21:03 .vercel
+-rw-r--r--. 1 marcelo marcelo    299 mar 13 08:09 .vercelignore
+-rw-r--r--. 1 marcelo marcelo    768 mar 13 08:43 vercel.json

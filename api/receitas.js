@@ -1,5 +1,7 @@
 import prisma from '../lib/prisma.js';
 import { verifyToken } from '../lib/auth.js';
+import { setCorsHeaders } from '../lib/cors.js';
+import { handleApiError } from '../lib/errorHandler.js';
 
 const TIPOS_RECEITA = new Set(['fixa', 'variavel']);
 
@@ -79,9 +81,7 @@ function mapReceitaToFrontend(receita) {
 }
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  setCorsHeaders(req, res);
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -133,8 +133,7 @@ export default async function handler(req, res) {
         total_geral: totalFixas + totalVariaveis,
       });
     } catch (error) {
-      console.error('Erro ao buscar receitas:', error);
-      return res.status(500).json({ success: false, message: 'Erro no servidor' });
+      return handleApiError(error, res);
     }
   }
 
@@ -159,8 +158,7 @@ export default async function handler(req, res) {
         id: receita.id,
       });
     } catch (error) {
-      console.error('Erro ao criar receita:', error);
-      return res.status(500).json({ success: false, message: 'Erro no servidor' });
+      return handleApiError(error, res);
     }
   }
 
@@ -197,8 +195,7 @@ export default async function handler(req, res) {
         message: 'Receita atualizada',
       });
     } catch (error) {
-      console.error('Erro ao atualizar receita:', error);
-      return res.status(500).json({ success: false, message: 'Erro no servidor' });
+      return handleApiError(error, res);
     }
   }
 
@@ -226,8 +223,7 @@ export default async function handler(req, res) {
         message: 'Receita removida',
       });
     } catch (error) {
-      console.error('Erro ao deletar receita:', error);
-      return res.status(500).json({ success: false, message: 'Erro no servidor' });
+      return handleApiError(error, res);
     }
   }
 

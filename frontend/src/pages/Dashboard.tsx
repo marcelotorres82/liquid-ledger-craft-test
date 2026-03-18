@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useMemo, useState } from 'react';
-import { ArrowDownRight, ArrowUpRight, Pencil, Sparkles, X } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ArrowDownRight, ArrowUpRight, Pencil, Sparkles, X, PiggyBank, BarChart3, ChevronRight, TrendingUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import PageContainer from '@/components/PageContainer';
 import GlassCard from '@/components/GlassCard';
 import AnimatedNumber from '@/components/AnimatedNumber';
@@ -9,7 +10,7 @@ import AiInsightsCard from '@/components/AiInsightsCard';
 import { parseExpenseDescription } from '@/lib/expenseMeta';
 import { useFinanceStore } from '@/store/financeStore';
 import { formatCurrency, formatDate, getMonthName } from '@/lib/format';
-import { cn } from '@/lib/utils';
+import { cn, debounce } from '@/lib/utils';
 import { getExpenseIcon, getIncomeIcon } from '@/lib/transactionIcons';
 
 interface DashboardProps {
@@ -89,6 +90,7 @@ function isMobileContext() {
 }
 
 const Dashboard = ({ onLogout }: DashboardProps) => {
+  const navigate = useNavigate();
   const user = useFinanceStore((state) => state.user);
   const dashboard = useFinanceStore((state) => state.dashboard);
   const receitasFixas = useFinanceStore((state) => state.receitasFixas);
@@ -277,6 +279,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
   const [displayName, setDisplayName] = useState(fallbackName);
   const [editorOpen, setEditorOpen] = useState(false);
   const [nameDraft, setNameDraft] = useState(fallbackName);
+	const [isSavingName, setIsSavingName] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -315,17 +318,27 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     };
   }, [editorOpen, nameDraft, userScopedKey]);
 
-  const handlePersistName = () => {
-    const nextName = nameDraft.trim() || fallbackName;
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem(userScopedKey, nextName);
-      window.localStorage.setItem(userScopedOnboardKey, '1');
-    }
+  const handlePersistName = useMemo(
+    () =>
+      debounce(() => {
+        const nextName = nameDraft.trim() || fallbackName;
+        setIsSavingName(true);
 
-    setDisplayName(nextName);
-    setNameDraft(nextName);
-    setEditorOpen(false);
-  };
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(userScopedKey, nextName);
+          window.localStorage.setItem(userScopedOnboardKey, '1');
+        }
+
+        setDisplayName(nextName);
+        setNameDraft(nextName);
+
+        setTimeout(() => {
+          setIsSavingName(false);
+          setEditorOpen(false);
+        }, 400);
+      }, 300),
+    [nameDraft, fallbackName, userScopedKey, userScopedOnboardKey]
+  );
 
   const titleNode = useMemo(
     () => (
@@ -352,119 +365,164 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
   return (
     <PageContainer titleNode={titleNode} subtitle="Resumo financeiro inteligente do mês" onLogout={onLogout}>
-      <GlassCard className="mb-4 overflow-hidden relative glass-neutral" delay={0.1}>
-        <p className="text-caption text-muted-foreground uppercase tracking-[0.14em] mb-1">Saldo do mês</p>
-        <div className="text-large-title text-foreground leading-tight">
+      <GlassCard className="mb-6 relative oppo-card border-none" delay={0.1}>
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
+        <p className="text-caption text-muted-foreground uppercase tracking-[0.2em] mb-2 opacity-70">Saldo do mês</p>
+        <div className="text-[42px] font-bold text-foreground leading-none tracking-tight oppo-glow-text">
           <AnimatedNumber value={balance} prefix="R$ " />
+        </div>
+        <div className="flex items-center gap-2 mt-4">
+          <div className="px-3 py-1 rounded-full bg-success/10 border border-success/20 flex items-center gap-1.5">
+            <TrendingUp className="w-3 h-3 text-success" />
+            <span className="text-[12px] font-semibold text-success">+{savingsRate}% este mês</span>
+          </div>
         </div>
       </GlassCard>
 
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <GlassCard delay={0.15} className="glass-neutral">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-xl gradient-income flex items-center justify-center shadow-sm shadow-income/30">
-              <ArrowUpRight className="w-4 h-4 text-income-foreground" />
-            </div>
-            <span className="text-caption text-muted-foreground">Receitas</span>
-          </div>
-          <div className="text-title-3 text-foreground">
-            <AnimatedNumber value={totalIncome} prefix="R$ " />
-          </div>
-        </GlassCard>
+      <div className="mb-8">
+        <AiInsightsCard
+          lines={insights}
+          hint={insightHint}
+          isLoading={isLoadingInsights}
+          source={insightSource}
+          model={insightModel}
+          onRefresh={regenerateInsights}
+        />
+      </div>
 
-        <GlassCard delay={0.2} className="glass-neutral">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-xl gradient-expense flex items-center justify-center shadow-sm shadow-expense/30">
-              <ArrowDownRight className="w-4 h-4 text-expense-foreground" />
+      <section className="mb-8">
+        <div className="flex items-center justify-between mb-4 px-1">
+          <h3 className="text-headline text-muted-foreground uppercase tracking-widest text-[11px]">Categorias</h3>
+          <span className="text-caption text-primary font-medium flex items-center gap-1">Ver tudo <ChevronRight className="w-3 h-3" /></span>
+        </div>
+        
+        <div className="horizontal-scroller hide-scrollbar">
+          {/* Receitas Card */}
+          <div className="snap-scroller-item w-[280px]">
+            <GlassCard 
+              onClick={() => navigate('/income')}
+              className="h-[180px] flex flex-col justify-between p-6 oppo-card group active:scale-[0.98] transition-transform"
+            >
+              <div className="w-12 h-12 rounded-2xl gradient-income flex items-center justify-center shadow-lg shadow-success/20 group-hover:scale-110 transition-transform">
+                <ArrowUpRight className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-caption text-muted-foreground mb-1 uppercase tracking-wider">Receitas</p>
+                <div className="text-2xl font-bold text-foreground">
+                  <AnimatedNumber value={totalIncome} prefix="R$ " />
+                </div>
+              </div>
+            </GlassCard>
+          </div>
+
+          {/* Despesas Card */}
+          <div className="snap-scroller-item w-[280px]">
+            <GlassCard 
+              onClick={() => navigate('/expenses')}
+              className="h-[180px] flex flex-col justify-between p-6 oppo-card group active:scale-[0.98] transition-transform"
+            >
+              <div className="w-12 h-12 rounded-2xl gradient-expense flex items-center justify-center shadow-lg shadow-destructive/20 group-hover:scale-110 transition-transform">
+                <ArrowDownRight className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-caption text-muted-foreground mb-1 uppercase tracking-wider">Despesas</p>
+                <div className="text-2xl font-bold text-foreground">
+                  <AnimatedNumber value={totalExpenses} prefix="R$ " />
+                </div>
+              </div>
+            </GlassCard>
+          </div>
+
+          {/* Caixinhas Card */}
+          <div className="snap-scroller-item w-[280px]">
+            <GlassCard 
+              onClick={() => navigate('/savings')}
+              className="h-[180px] flex flex-col justify-between p-6 oppo-card group active:scale-[0.98] transition-transform"
+            >
+              <div className="w-12 h-12 rounded-2xl gradient-savings flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
+                <PiggyBank className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-caption text-muted-foreground mb-1 uppercase tracking-wider">Caixinhas</p>
+                <div className="text-2xl font-bold text-foreground">
+                   Poupança ativa
+                </div>
+              </div>
+            </GlassCard>
+          </div>
+
+          {/* Análise Card */}
+          <div className="snap-scroller-item w-[280px]">
+            <GlassCard 
+              onClick={() => navigate('/analytics')}
+              className="h-[180px] flex flex-col justify-between p-6 oppo-card group active:scale-[0.98] transition-transform"
+            >
+              <div className="w-12 h-12 rounded-2xl gradient-accent flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:scale-110 transition-transform">
+                <BarChart3 className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-caption text-muted-foreground mb-1 uppercase tracking-wider">Análise</p>
+                <div className="text-2xl font-bold text-foreground">
+                  Insights detalhados
+                </div>
+              </div>
+            </GlassCard>
+          </div>
+        </div>
+      </section>
+
+      {/* Other components preserved but styled or rearranged if needed */}
+      <div className="space-y-4 mb-8">
+        <GlassCard delay={0.28} className="oppo-card">
+          <div className="flex items-start justify-between gap-3 mb-6">
+            <div>
+              <p className="text-caption text-muted-foreground uppercase tracking-[0.14em] mb-1">Agenda</p>
+              <p className="text-[20px] font-bold text-foreground">Contas à pagar</p>
             </div>
-            <span className="text-caption text-muted-foreground">A pagar</span>
+            <div className="text-right">
+              <p className="text-caption text-muted-foreground">Total pendente</p>
+              <p className="text-headline font-bold text-expense">{formatCurrency(pendingTotal)}</p>
+            </div>
           </div>
-          <div className="text-title-3 text-foreground">
-            <AnimatedNumber value={dashboard?.despesas.contas_a_pagar ?? totalExpenses} prefix="R$ " />
+
+          <div className="grid grid-cols-3 gap-3 mb-6">
+            <div className="liquid-glass-sm p-3 flex flex-col items-center text-center bg-secondary/30 border-none">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-tighter mb-1">Atrasadas</p>
+              <p className="text-headline font-bold text-expense">{overdueCount}</p>
+            </div>
+            <div className="liquid-glass-sm p-3 flex flex-col items-center text-center bg-secondary/30 border-none">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-tighter mb-1">Próximas</p>
+              <p className="text-headline font-bold text-foreground">{dueInThreeDaysCount}</p>
+            </div>
+            <div className="liquid-glass-sm p-3 flex flex-col items-center text-center bg-secondary/30 border-none">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-tighter mb-1">Na semana</p>
+              <p className="text-headline font-bold text-foreground">{dueInWeekCount}</p>
+            </div>
           </div>
-          {(dashboard?.despesas.pagas ?? 0) > 0 && (
-            <p className="text-caption text-muted-foreground mt-0.5">
-              Pago: {formatCurrency(dashboard?.despesas.pagas ?? 0)}
-            </p>
-          )}
+
+          <div className="space-y-4">
+            {visibleDueReminders.map((entry) => (
+              <div key={entry.id} className="flex items-center gap-4 group">
+                <div className="w-11 h-11 rounded-2xl bg-secondary/50 flex items-center justify-center text-muted-foreground shrink-0 group-hover:bg-secondary transition-colors">
+                  {entry.icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[15px] font-semibold text-foreground truncate">{entry.title}</p>
+                  <p className={cn(
+                    'text-[12px]',
+                    entry.daysUntil < 0 ? 'text-expense font-medium' : 'text-muted-foreground'
+                  )}>
+                    {dueLabel(entry.daysUntil)}
+                  </p>
+                </div>
+                <p className="text-[14px] font-bold text-foreground">{formatCurrency(entry.amount)}</p>
+              </div>
+            ))}
+          </div>
         </GlassCard>
       </div>
 
-      <GlassCard delay={0.25} className="mb-4 glass-neutral">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-2xl gradient-accent flex items-center justify-center shrink-0 shadow-sm shadow-primary/30">
-            <Sparkles className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <p className="text-subhead font-semibold text-foreground">
-              {savingsRate >= 0 ? `Você poupou ${savingsRate}% da renda` : `Déficit de ${Math.abs(savingsRate)}% da renda`}
-            </p>
-            <p className="text-caption text-muted-foreground mt-0.5">
-              {savingsRate >= 30
-                ? 'Ótimo desempenho. Mantenha o ritmo.'
-                : 'Se possível, reduza gastos variáveis para aumentar a sobra.'}
-            </p>
-          </div>
-        </div>
-      </GlassCard>
-
-      <GlassCard delay={0.28} className="mb-4 glass-neutral">
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <div>
-            <p className="text-caption text-muted-foreground uppercase tracking-[0.14em] mb-1">Agenda de vencimentos</p>
-            <p className="text-headline text-foreground">Lembretes de contas</p>
-          </div>
-          <div className="text-right">
-            <p className="text-caption text-muted-foreground">Pendente</p>
-            <p className="text-subhead font-semibold text-expense">{formatCurrency(pendingTotal)}</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-3 gap-2 mb-3">
-          <div className="rounded-xl bg-secondary/50 border border-border/60 p-2">
-            <p className="text-caption text-muted-foreground">Atrasadas</p>
-            <p className="text-headline text-expense">{overdueCount}</p>
-          </div>
-          <div className="rounded-xl bg-secondary/50 border border-border/60 p-2">
-            <p className="text-caption text-muted-foreground">Até 3 dias</p>
-            <p className="text-headline text-foreground">{dueInThreeDaysCount}</p>
-          </div>
-          <div className="rounded-xl bg-secondary/50 border border-border/60 p-2">
-            <p className="text-caption text-muted-foreground">Até 7 dias</p>
-            <p className="text-headline text-foreground">{dueInWeekCount}</p>
-          </div>
-        </div>
-
-        <div className="space-y-2.5">
-          {visibleDueReminders.length === 0 && (
-            <p className="text-subhead text-muted-foreground">
-              Nenhuma conta pendente para lembrete neste período.
-            </p>
-          )}
-
-          {visibleDueReminders.map((entry) => (
-            <div key={entry.id} className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-full bg-secondary/85 border border-border/70 flex items-center justify-center text-muted-foreground shrink-0">
-                {entry.icon}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-subhead font-medium text-foreground truncate">{entry.title}</p>
-                <p
-                  className={cn(
-                    'text-caption',
-                    entry.daysUntil < 0 ? 'text-expense' : entry.daysUntil <= 3 ? 'text-warning' : 'text-muted-foreground'
-                  )}
-                >
-                  {dueLabel(entry.daysUntil)} · {formatDate(entry.dueDateISO)}
-                </p>
-              </div>
-              <p className="text-caption font-semibold text-expense whitespace-nowrap">{formatCurrency(entry.amount)}</p>
-            </div>
-          ))}
-        </div>
-      </GlassCard>
-
-      <GlassCard delay={0.3} className="mb-4 glass-neutral">
+      <GlassCard delay={0.3} className="mb-4">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div>
             <p className="text-caption text-muted-foreground uppercase tracking-[0.14em] mb-1">Projeção de saldo</p>
@@ -478,13 +536,13 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-3">
           {projectedBalances.map((projection) => (
-            <div key={`projection-${projection.days}`} className="rounded-xl bg-secondary/50 border border-border/60 p-2">
-              <p className="text-caption text-muted-foreground">{projection.days} dias</p>
+            <div key={`projection-${projection.days}`} className="liquid-glass-sm p-3 flex flex-col items-center text-center">
+              <p className="text-caption text-muted-foreground mb-1">{projection.days} dias</p>
               <p
                 className={cn(
-                  'font-semibold leading-tight whitespace-nowrap text-[clamp(0.85rem,3.6vw,1rem)]',
+                  'font-semibold leading-tight text-[15px]',
                   projection.value >= 0 ? 'text-foreground' : 'text-expense'
                 )}
               >
@@ -500,19 +558,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         </p>
       </GlassCard>
 
-      <AiInsightsCard
-        lines={insights}
-        hint={insightHint}
-        isLoading={isLoadingInsights}
-        source={insightSource}
-        model={insightModel}
-        onRefresh={regenerateInsights}
-      />
-
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}>
-        <h2 className="text-title-3 text-foreground text-center mb-3">Movimentações recentes</h2>
+        <h2 className="text-title-3 text-foreground text-center mb-6">Movimentações recentes</h2>
 
-        <GlassCard delay={0.4} className="divide-y divide-border glass-neutral">
+        <GlassCard delay={0.4} className="divide-y divide-border/40">
           <div className="max-h-[330px] overflow-y-auto pr-1 scrollbar-hide">
             {isLoadingData && recentTransactions.length === 0 && (
               <p className="text-subhead text-muted-foreground py-3">Carregando movimentações...</p>
@@ -584,9 +633,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               <button
                 type="button"
                 onClick={handlePersistName}
-                className="w-full mt-4 py-3 rounded-2xl text-headline gradient-savings text-savings-foreground tap-highlight-none active:scale-[0.98]"
+								disabled={isSavingName}
+                className="w-full mt-4 py-3 rounded-2xl text-headline gradient-savings text-savings-foreground tap-highlight-none active:scale-[0.98] transition-opacity disabled:opacity-60"
               >
-                Salvar nome
+                {isSavingName ? 'Salvando...' : 'Salvar nome'}
               </button>
             </div>
           </motion.div>

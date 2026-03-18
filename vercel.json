@@ -1,13 +1,10 @@
 {
   "version": 2,
   "framework": null,
+  "installCommand": "npm install",
   "buildCommand": "npm run vercel-build",
   "outputDirectory": "public",
   "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    },
     {
       "source": "/app",
       "destination": "/app/index.html"

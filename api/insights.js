@@ -1,15 +1,16 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { verifyToken } from '../lib/auth.js';
-import { query } from '../lib/db.js';
+import { queryRaw as query } from '../lib/prisma.js';
+import { setCorsHeaders } from '../lib/cors.js';
+import { handleApiError } from '../lib/errorHandler.js';
 
 const BASE_MODEL_CANDIDATES = [
   process.env.GEMINI_MODEL,
-  'gemini-2.5-pro',
-  'gemini-2.5-flash',
-  'gemini-2.0-pro',
-  'gemini-flash-latest',
-  'gemini-2.0-flash',
-  'gemini-pro-latest'
+  'gemini-1.5-pro',
+  'gemini-1.5-flash',
+  'gemini-2.0-flash-exp',
+  'gemini-1.0-pro',
+  'gemini-pro'
 ].filter(Boolean);
 
 let cachedModelName = process.env.GEMINI_MODEL || null;
@@ -304,9 +305,7 @@ function getReferencePeriod() {
 }
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  setCorsHeaders(req, res);
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -412,7 +411,6 @@ export default async function handler(req, res) {
 
     return res.status(405).json({ success: false, message: 'Método não permitido' });
   } catch (error) {
-    console.error('Insights error:', error);
-    return res.status(500).json({ success: false, message: 'Erro no servidor' });
+    return handleApiError(error, res);
   }
 }

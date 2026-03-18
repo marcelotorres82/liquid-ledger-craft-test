@@ -1,5 +1,7 @@
 import prisma from '../lib/prisma.js';
 import { verifyToken } from '../lib/auth.js';
+import { setCorsHeaders } from '../lib/cors.js';
+import { handleApiError } from '../lib/errorHandler.js';
 
 const DISTRIBUTION_RULES = [
   { categoria: 'Casa', percentual: 50 },
@@ -160,9 +162,7 @@ function getReferencePeriod() {
 }
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  setCorsHeaders(req, res);
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -441,7 +441,6 @@ export default async function handler(req, res) {
       parcelamentos_ativos: parcelamentosAtivos,
     });
   } catch (error) {
-    console.error('Erro ao buscar dashboard:', error);
-    return res.status(500).json({ success: false, message: 'Erro no servidor' });
+    return handleApiError(error, res);
   }
 }
