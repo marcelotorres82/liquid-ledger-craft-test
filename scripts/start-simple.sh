@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Carrega variáveis de ambiente do .env
+if [ -f ../.env ]; then
+  export $(grep -v '^#' ../.env | xargs)
+elif [ -f .env ]; then
+  export $(grep -v '^#' .env | xargs)
+fi
+
 echo "🚀 Iniciando ambiente simplificado..."
 
 # Parar processos anteriores
@@ -13,7 +20,7 @@ rm -f dev.db server.log frontend.log
 cat > schema-simple.prisma << 'EOF'
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -41,15 +48,21 @@ npx prisma db push --schema schema-simple.prisma
 # Criar usuário
 echo "👤 Criando usuário padrão..."
 node -e "
+require('dotenv').config({ path: '../.env' });
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient({
-  datasources: { db: { url: 'file:./dev.db' } }
+  datasources: { db: { url: process.env.DATABASE_URL } }
 });
 
 async function main() {
-  const hashedPassword = await bcrypt.hash('042016', 10);
+  const defaultPassword = process.env.DEFAULT_PASSWORD;
+  if (!defaultPassword) {
+    console.error('ERRO: A variável de ambiente DEFAULT_PASSWORD não está definida.');
+    process.exit(1);
+  }
+  const hashedPassword = await bcrypt.hash(defaultPassword, 10);
   await prisma.usuario.upsert({
     where: { email: 'marcelo' },
     update: {},
@@ -59,7 +72,7 @@ async function main() {
       senha: hashedPassword
     }
   });
-  console.log('✅ Usuário marcelo criado com senha 042016');
+  console.log('✅ Usuário marcelo criado');
   await prisma.\$disconnect();
 }
 
@@ -68,12 +81,7 @@ main().catch(console.error);
 
 # Iniciar backend
 echo "🌐 Iniciando backend na porta 3001..."
-DATABASE_URL="file:./dev.db" \
-JWT_SECRET="a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6" \
-GEMINI_API_KEY="AIzaSyAqcO0JcrYDfJzz96nAJqLBKKam2aywm5I" \
-GEMINI_MODEL="gemini-2.5-flash" \
-PORT=3001 \
-npx vercel dev > server.log 2>&1 &
+PORT=3001 npx vercel dev > server.log 2>&1 &
 
 BACKEND_PID=$!
 echo "📋 Backend PID: $BACKEND_PID"
@@ -90,8 +98,6 @@ echo ""
 echo "✅ Ambiente iniciado!"
 echo "🌐 Backend: http://localhost:3001"
 echo "🎨 Frontend: http://localhost:5173/app/#/"
-echo "👤 Usuário: marcelo"
-echo "🔑 Senha: 042016"
 echo ""
 echo "📋 Logs disponíveis em:"
 echo "  Backend: tail -f server.log"

@@ -5,13 +5,21 @@ import { createServer } from 'http';
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const prisma = new PrismaClient();
-const PORT = 3001;
-const JWT_SECRET = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6';
+const PORT = process.env.PORT || 3001;
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  console.error('FATAL ERROR: JWT_SECRET is not defined. Please set it in your .env file');
+  process.exit(1);
+}
 
 // Utility functions
 function generateToken(userId, email) {
@@ -386,7 +394,6 @@ async function startServer() {
       console.log(`📱 Páginas:`);
       console.log(`   http://localhost:${PORT}/ (Login)`);
       console.log(`   http://localhost:${PORT}/app (App React)`);
-      console.log(`🔑 Credenciais: marcelo / 042016`);
     });
   } catch (error) {
     console.error('❌ Falha ao iniciar servidor:', error);

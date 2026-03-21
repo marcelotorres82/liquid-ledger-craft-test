@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Carrega variáveis de ambiente do .env
+if [ -f .env ]; then
+  export $(grep -v '^#' .env | xargs)
+fi
+
 echo "🚀 Iniciando App Financeiro - Setup Completo"
 echo "=========================================="
 
@@ -46,17 +51,17 @@ check_success "Prisma Client gerado"
 
 # 4. Criar banco de dados
 show_status "Criando banco de dados..."
-DATABASE_URL="file:./dev.db" npx prisma db push --schema lib/prisma/schema-fixed.prisma
+npx prisma db push --schema lib/prisma/schema-fixed.prisma
 check_success "Banco de dados criado"
 
 # 5. Popular banco com dados iniciais
 show_status "Populando banco de dados..."
-DATABASE_URL="file:./dev.db" node seed-final.js
+node seed-final.js
 check_success "Banco de dados populado"
 
 # 6. Verificar se usuário foi criado
 show_status "Verificando usuário..."
-USER_COUNT=$(DATABASE_URL="file:./dev.db" node -e "
+USER_COUNT=$(node -e "
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 prisma.usuario.count().then(count => console.log(count)).finally(() => prisma.\$disconnect());
@@ -81,10 +86,6 @@ echo -e "${BLUE}📱 Acesse:${NC}"
 echo -e "   Login: ${YELLOW}http://localhost:3001${NC}"
 echo -e "   App:   ${YELLOW}http://localhost:3001/app${NC}"
 echo ""
-echo -e "${BLUE}🔑 Credenciais:${NC}"
-echo -e "   Login: ${YELLOW}marcelo${NC}"
-echo -e "   Senha: ${YELLOW}042016${NC}"
-echo ""
 echo -e "${BLUE}📊 API Endpoints:${NC}"
 echo -e "   Health: ${YELLOW}GET  http://localhost:3001/health${NC}"
 echo -e "   Auth:   ${YELLOW}POST http://localhost:3001/api/auth${NC}"
@@ -93,9 +94,4 @@ echo ""
 echo -e "${GREEN}🚀 Iniciando servidor...${NC}"
 
 # Iniciar servidor em background
-DATABASE_URL="file:./dev.db" \
-JWT_SECRET="a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6" \
-GEMINI_API_KEY="AIzaSyAqcO0JcrYDfJzz96nAJqLBKKam2aywm5I" \
-GEMINI_MODEL="gemini-2.5-flash" \
-PORT=3001 \
-node server-final.js
+PORT=3001 node server-final.js

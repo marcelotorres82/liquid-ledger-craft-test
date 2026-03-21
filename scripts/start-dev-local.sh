@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Carrega variáveis de ambiente do .env
+if [ -f ../.env ]; then
+  export $(grep -v '^#' ../.env | xargs)
+elif [ -f .env ]; then
+  export $(grep -v '^#' .env | xargs)
+fi
+
 echo "🚀 Iniciando ambiente de desenvolvimento local..."
 
 # Verificar Node.js
@@ -13,12 +20,7 @@ rm -f server.log
 
 # Iniciar backend com SQLite local
 echo "📊 Iniciando backend com SQLite local..."
-DATABASE_URL="file:./dev.db" \
-JWT_SECRET="a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6" \
-GEMINI_API_KEY="AIzaSyAqcO0JcrYDfJzz96nAJqLBKKam2aywm5I" \
-GEMINI_MODEL="gemini-2.5-flash" \
-PORT=3001 \
-npx vercel dev --port 3001 > server.log 2>&1 &
+PORT=3001 npx vercel dev --port 3001 > server.log 2>&1 &
 
 BACKEND_PID=$!
 echo "📋 Backend PID: $BACKEND_PID"

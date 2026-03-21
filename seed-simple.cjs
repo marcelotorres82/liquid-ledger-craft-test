@@ -1,10 +1,11 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
+require('dotenv').config();
 
 const prisma = new PrismaClient({
   datasources: {
     db: {
-      url: 'file:./dev.db'
+      url: process.env.DATABASE_URL || 'file:./dev.db'
     }
   }
 });
@@ -12,7 +13,11 @@ const prisma = new PrismaClient({
 async function main() {
   console.log('🌱 Criando banco SQLite...');
   
-  const defaultPassword = '042016';
+  const defaultPassword = process.env.DEFAULT_PASSWORD;
+  if (!defaultPassword) {
+    console.error('ERRO: A variável de ambiente DEFAULT_PASSWORD não está definida.');
+    process.exit(1);
+  }
   const hashedPassword = await bcrypt.hash(defaultPassword, 10);
   
   const admin = await prisma.usuario.upsert({
@@ -26,7 +31,6 @@ async function main() {
   });
   
   console.log('✅ Usuário criado:', admin.email);
-  console.log('🔑 Senha:', defaultPassword);
   await prisma.$disconnect();
   console.log('✅ Banco pronto!');
 }

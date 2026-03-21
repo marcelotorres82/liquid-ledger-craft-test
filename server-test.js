@@ -2,10 +2,19 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { createServer } from 'http';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const prisma = new PrismaClient();
-const PORT = 3001;
-const JWT_SECRET = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6';
+const PORT = process.env.PORT || 3001;
+const JWT_SECRET = process.env.JWT_SECRET;
+const DEFAULT_PASSWORD = process.env.DEFAULT_PASSWORD;
+
+if (!JWT_SECRET || !DEFAULT_PASSWORD) {
+  console.error('FATAL ERROR: JWT_SECRET or DEFAULT_PASSWORD are not defined in .env file');
+  process.exit(1);
+}
 
 function generateToken(userId, email) {
   return jwt.sign(
@@ -122,7 +131,7 @@ async function startServer() {
     
     if (userCount === 0) {
       console.log('⚠️  No users found. Creating default user...');
-      const hashedPassword = await bcrypt.hash('042016', 10);
+      const hashedPassword = await bcrypt.hash(DEFAULT_PASSWORD, 10);
       await prisma.usuario.create({
         data: {
           nome: 'marcelo',
@@ -138,7 +147,6 @@ async function startServer() {
       console.log(`📝 Test endpoints:`);
       console.log(`   GET  http://localhost:${PORT}/health`);
       console.log(`   POST http://localhost:${PORT}/api/auth`);
-      console.log(`🔑 Default credentials: marcelo / 042016`);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);

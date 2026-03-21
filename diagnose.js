@@ -61,7 +61,15 @@ try {
     
     // Criar usuário de teste
     const bcrypt = await import('bcryptjs');
-    const hashedPassword = await bcrypt.hash('042016', 10);
+    const dotenv = await import('dotenv');
+    dotenv.config();
+
+    const defaultPassword = process.env.DEFAULT_PASSWORD;
+    if (!defaultPassword) {
+      log('ERRO: A variável de ambiente DEFAULT_PASSWORD não está definida.');
+      throw new Error('DEFAULT_PASSWORD not set');
+    }
+    const hashedPassword = await bcrypt.hash(defaultPassword, 10);
     
     const newUser = await prisma.usuario.create({
       data: {

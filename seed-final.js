@@ -1,15 +1,22 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import dotenv from 'dotenv';
 
+dotenv.config();
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Iniciando seed do banco de dados...');
 
+  const DEFAULT_PASSWORD = process.env.DEFAULT_PASSWORD;
+  if (!DEFAULT_PASSWORD) {
+    console.error('ERRO: A variável de ambiente DEFAULT_PASSWORD não está definida.');
+    process.exit(1);
+  }
+
   try {
     // Criar usuário padrão
-    const defaultPassword = '042016';
-    const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+    const hashedPassword = await bcrypt.hash(DEFAULT_PASSWORD, 10);
 
     const admin = await prisma.usuario.upsert({
       where: { email: 'marcelo' },
