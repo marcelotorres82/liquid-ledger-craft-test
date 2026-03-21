@@ -370,8 +370,8 @@ const ExpenseSheet = ({ open, onClose, onSave, initialDate, referenceMonth, edit
                           className={cn(
                             'whitespace-nowrap px-4 py-2 rounded-2xl text-subhead font-medium transition-colors tap-highlight-none snap-start',
                             isSelected 
-                              ? 'gradient-expense text-expense-foreground shadow-sm shadow-expense/20' 
-                              : 'bg-secondary text-muted-foreground border border-border/40'
+                              ? 'gradient-expense text-expense-foreground' 
+                              : 'bg-secondary text-muted-foreground'
                           )}
                         >
                           {label}
@@ -414,25 +414,27 @@ const ExpenseSheet = ({ open, onClose, onSave, initialDate, referenceMonth, edit
                       </p>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPaga((current) => {
-                          const next = !current;
-                          if (next && !dataPagamento) {
-                            setDataPagamento(getTodayISODate());
-                          }
-                          return next;
-                        });
-                      }}
-                      className={cn(
-                        'payment-switch tap-highlight-none',
-                        paga ? 'payment-switch-off' : 'payment-switch-on'
-                      )}
-                      aria-label={paga ? 'Marcar como não paga' : 'Marcar como paga'}
-                    >
-                      <span className="payment-switch-knob" />
-                    </button>
+                    <div className="flex items-center">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPaga((current) => {
+                            const next = !current;
+                            if (next && !dataPagamento) {
+                              setDataPagamento(getTodayISODate());
+                            }
+                            return next;
+                          });
+                        }}
+                        className={cn(
+                          'payment-switch tap-highlight-none',
+                          paga ? 'payment-switch-off' : 'payment-switch-on'
+                        )}
+                        aria-label={paga ? 'Marcar como não paga' : 'Marcar como paga'}
+                      >
+                        <span className="payment-switch-knob" />
+                      </button>
+                    </div>
                   </div>
                 </div>
 

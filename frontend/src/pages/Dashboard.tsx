@@ -513,12 +513,13 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         source={insightSource}
         model={insightModel}
         onRefresh={regenerateInsights}
+        className="w-full"
       />
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...sparkleTransition, delay: 0.35 }}>
         <h2 className="text-title-3 text-foreground text-center mb-3">Movimentações recentes</h2>
 
-        <GlassCard delay={0.4} className="divide-y divide-border glass-neutral">
+        <GlassCard delay={0.4} className="divide-y divide-border glass-neutral w-full">
           <div className="max-h-[330px] overflow-y-auto pr-1 scrollbar-hide">
             {isLoadingData && recentTransactions.length === 0 && (
               <p className="text-subhead text-muted-foreground py-3">Carregando movimentações...</p>

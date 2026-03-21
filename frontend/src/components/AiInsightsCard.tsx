@@ -19,7 +19,7 @@ function renderBoldSegments(text: string) {
       const matched = part.match(/^\*\*(.+)\*\*$/);
       if (matched) {
         return (
-          <strong key={`bold-${index}`} className="font-semibold text-foreground">
+          <strong key={`bold-${index}`} className="text-foreground">
             {matched[1]}
           </strong>
         );
@@ -113,7 +113,7 @@ const AiInsightsCard = ({ lines, hint, isLoading, source, model, onRefresh }: Ai
               className="ai-insight-item"
             >
               <div className="ai-insight-badge">{index + 1}</div>
-              <p className="text-subhead text-foreground flex-1">{renderBoldSegments(line)}</p>
+              <p className="text-footnote text-foreground flex-1">{renderBoldSegments(line)}</p>
             </motion.article>
           ))
         ) : (

@@ -50,3 +50,4 @@ lib/prisma/migrations/
 public/downloads/*.apk
 .vercel
 .env*.local
+lib/prisma/dev.db
